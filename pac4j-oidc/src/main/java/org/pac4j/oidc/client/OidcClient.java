@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.nimbusds.jwt.JWT;
 import org.apache.commons.lang3.StringUtils;
 import org.pac4j.core.client.ClientType;
 import org.pac4j.core.client.IndirectClient;
@@ -447,7 +448,7 @@ public class OidcClient extends IndirectClient<OidcCredentials, OidcProfile> {
             profile.setIdTokenString(oidcTokens.getIDTokenString());
 
             // User Info request
-            UserInfo userInfo = null;
+            JWT userInfo = null;
             if (getProviderMetadata().getUserInfoEndpointURI() != null) {
                 UserInfoRequest userInfoRequest = buildUserInfoRequest(accessToken);
                 HTTPRequest userInfoHttpRequest = userInfoRequest.toHTTPRequest();
@@ -464,9 +465,9 @@ public class OidcClient extends IndirectClient<OidcCredentials, OidcProfile> {
                             ((UserInfoErrorResponse) userInfoResponse).getErrorObject());
                 } else {
                     UserInfoSuccessResponse userInfoSuccessResponse = (UserInfoSuccessResponse) userInfoResponse;
-                    userInfo = userInfoSuccessResponse.getUserInfo();
+                    userInfo = userInfoSuccessResponse.getUserInfoJWT();
                     if(userInfo != null){
-                    	profile.addAttributes(userInfo.toJWTClaimsSet().getClaims());
+                    	profile.addAttributes(userInfo.getJWTClaimsSet().getClaims());
                     }
                 }
             }
